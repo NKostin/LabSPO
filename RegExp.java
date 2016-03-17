@@ -10,7 +10,7 @@ public class RegExp {
 public static void main(String []args) throws IOException{
 		
 		
-		BufferedReader reader = new BufferedReader(new FileReader("C:/Users/oleg/Desktop/1.txt"));
+	BufferedReader reader = new BufferedReader(new FileReader("C:/Users/oleg/Desktop/1.txt"));
         String line;
         int f = 0;
         
