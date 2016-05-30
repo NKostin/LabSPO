@@ -1,1 +1,19 @@
-1
+Грамматика лабораторной работы:
+lang: (expr)*
+expr: declare | assign
+declare: VAR_KW WS VAR SM
+assign: VAR ASSIGN_OP smth SM
+smth: smth_unit (PLUS| MINUS |DEL| UMN smth_unit)*
+sth_unit: OPENBR smth DIGIT | VAR (CLOSEBR)*
+VAR_KW:  ^var$
+WS: ^\\s*$
+VAR: ^[a-zA-Z]+$*
+DIGIT: ^0|[1-9]{1}[0-9]*$
+SM: ^;$
+ASSIGN_OP: ^=$
+OPENBR: ^[)]$
+CLOSEBR: ^[(]$   
+PLUS: ^[+]$
+MINUS: ^[-]$
+DEL: ^[/]$
+UMN: ^[*]$
