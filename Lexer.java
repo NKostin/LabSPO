@@ -1,4 +1,4 @@
-package ru.mirea.spo;
+package ru.mirea.spo.lab1;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,68 +12,50 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
-
-//import ru.mirea.spo.lab1.Token;
-
-
-
 public class Lexer {
+	
 	List<Token> tokens = new ArrayList<Token>();
 	String accum="";
 	String currentLucky = null;
-	
 	int i;
-
-	Pattern sm= Pattern.compile("^;$");
-	Pattern varKeyWordPattern = Pattern.compile("^var$");
-	Pattern assingOperationPattern = Pattern.compile("^=$");
-	Pattern op_MUL = Pattern.compile("^\\*$");
-	Pattern op_DIV = Pattern.compile("^\\/$");
-	Pattern op_ADD = Pattern.compile("^\\+$");
-	Pattern op_SUB = Pattern.compile("^\\-$");
-	Pattern digitPattern = Pattern.compile("^0|[1-9]{1}[0-9]*$");
-	Pattern varPattern = Pattern.compile("^[a-zA-Z]+$*");
-	Pattern ws = Pattern.compile("^\\s*$");
-	Pattern bracket_l = Pattern.compile("^\\($");
-	Pattern bracket_r = Pattern.compile("^\\)$");
-	//Pattern err = Pattern.compile("^!\\;|\\S$");
-
-	    public static final String TRUE = "true";
-	    public static final String FALSE = "false";
-	    public static final String NUM = "num";
-	    public static final String ADDRESS = "address";
-	    public static final String LABEL = "label";
-	    public static final String ID = "id";
-	    public static final String NOT = "not";
-	    public static final String OR = "or";
-	    public static final String AND = "and";
-	    public static final String GO = "go";
-	    public static final String FGO = "fgo";
-	    public static final String WRITE = "write";
-	Map<String, Pattern> keyWord = new HashMap<String, Pattern>();
-	Map<String, Pattern> termimal = new HashMap<String, Pattern>();
 	
-
+	Pattern sm = Pattern.compile("^;$");
+	Pattern varKeyWordPattern = Pattern.compile("^var$");
+	Pattern assign_op = Pattern.compile("^=$");
+	Pattern plus_op = Pattern.compile("^[+]$");
+	Pattern minus_op = Pattern.compile("^[-]$");
+	Pattern del_op = Pattern.compile("^[/]$");
+	Pattern umn_op = Pattern.compile("^[*]$");
+	
+	Pattern brk_op = Pattern.compile("^[(]$");
+	Pattern brc_cl = Pattern.compile("^[)]$");
+	
+	//Pattern op = Pattern.compile("^'-'|'+'|'/'|'*'$");
+	Pattern digit = Pattern.compile("^0|[1-9]{1}[0-9]*$");
+	Pattern var = Pattern.compile("^[a-zA-Z]+$*");
+	Pattern ws = Pattern.compile("^\\s*$");
+	
+	Map<String, Pattern> keyWords = new HashMap<String, Pattern>();
+	Map<String, Pattern> termenals = new HashMap<String, Pattern>();
+	
+	//Map<String, Pattern> regularTerminals = new HashMap<String, Pattern>();
 	
 	public Lexer(){
-		keyWord.put("VAR_KW", varKeyWordPattern);
-		termimal.put("SM", sm);
-		termimal.put("ASSING_OP", assingOperationPattern);
-		termimal.put("OP_MULTI", op_MUL);
-		termimal.put("OP_DIVISION", op_DIV);
-		termimal.put("OP_ADDITION", op_ADD);
-		termimal.put("OP_SUBTRACTION", op_SUB);
-		termimal.put("DIGIT", digitPattern);
-		termimal.put("VAR", varPattern);
-		termimal.put("WS", ws);
-		termimal.put("BRACKET LEFT", bracket_l);
-		termimal.put("BRACKET RIGHT", bracket_r);
-		//termimal.put("ERROR", err);
-		
+		keyWords.put("VAR_KW", varKeyWordPattern);
+		termenals.put("SM", sm);
+		termenals.put("ASSIGN_OP", assign_op);
+		termenals.put("DIGIT", digit);
+		termenals.put("VAR", var);
+		termenals.put("WS", ws);
+		termenals.put("PL", plus_op);
+		termenals.put("MN", minus_op);
+		termenals.put("DL", del_op);
+		termenals.put("UMN", umn_op);
+		termenals.put("BR_OP", brk_op);
+		termenals.put("BR_CL", brc_cl);
 		
 	}
-	
+
 	public void processInput(String filename) throws IOException {
 		File file = new File(filename);
 		Reader reader = new FileReader(file);
@@ -96,7 +78,6 @@ public class Lexer {
 	private void processLine(String line) {
 		for(i=0; i<line.length(); i++){
 			accum = accum + line.charAt(i);
-			//System.out.println(accum);
 			processAccum();
 		}
 		
@@ -104,15 +85,14 @@ public class Lexer {
 
 	private void processAccum() {
 		boolean found = false;
-		for(String regExpName:termimal.keySet()){
-			Pattern currentPattern = termimal.get(regExpName);
+		for(String regExpName: termenals.keySet()){
+			Pattern currentPattern = termenals.get(regExpName);
 			Matcher m = currentPattern.matcher(accum);
 			if(m.matches()){
 				currentLucky = regExpName;
 				
 				found=true;
 			}else{
-			
 				
 			}
 		}
@@ -122,17 +102,30 @@ public class Lexer {
 			i--;
 			accum="";
 			currentLucky = null;
-		}else if (currentLucky==null&&!found){
-		//currentLucky= "ERROR";
+		}
 		
-		//System.out.println("TOKEN("+currentLucky+") recognized with value:"+ accum.substring(0, accum.length()-1));
-		//tokens.add(new Token(currentLucky, accum.substring(0, accum.length()-1)));
+		for(String regExpName: keyWords.keySet()){
+			Pattern currentPattern = keyWords.get(regExpName);
+			Matcher m = currentPattern.matcher(accum);
+			if(m.matches()){
+				currentLucky = regExpName;
+			
+				found=true;
+			}else{
+				
+			}
+		}
+		if(currentLucky!=null&&!found){
+			System.out.println("TOKEN("+currentLucky+") recognized with value:"+ accum.substring(0, accum.length()-1));
+			tokens.add(new Token(currentLucky, accum.substring(0, accum.length()-1)));
+			i--;
+			accum="";
+			currentLucky = null;
+		}
 		
-		accum="";}
 	}
 	public List<Token> getTokens(){
 		return tokens;
 	}
-
 
 }
